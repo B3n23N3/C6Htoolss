@@ -10,6 +10,17 @@
             font-weight: normal;
             font-style: normal;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -20,7 +31,7 @@
         div{
             font-family: "Saira";
         }
-        input[type="number"] {
+        input{
             border: none;
             background-color: lightgray;
             font-family: 'Saira';
@@ -58,7 +69,8 @@
     </style>
 </head>
 <body>
-        <div><h1>随机数生成</h1><button class="back" onclick="window.location.href='a.html'"><<</button></div>
+    <div class="container">
+        <div><h1>随机数生成</h1><button class="back" onclick="window.location.href='home.html'"><<</button></div>
         <div class="form-group">
             <label>最小值：</label>
             <input placeholder="min" type="number" id="min" step="any" required>
@@ -77,8 +89,7 @@
         </div>
         <button onclick="generateNumbers()">生成随机数</button>
         <div id="result"></div>
-        <div></div>
-
+    </div>
     <script>
         function generateNumbers() {
             // 获取输入值
