@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>随机数</title>
+    <style>
+       @font-face{
+            font-family: 'Saira';
+            src: url(\Saira-Regular.ttf);
+            font-weight: normal;
+            font-style: normal;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+        div{
+            font-family: "Saira";
+        }
+        input[type="number"] {
+            border: none;
+            background-color: lightgray;
+            font-family: 'Saira';
+            font-size: 20px;
+            border-radius: 10px;
+            width: 200px;
+            padding: 5px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: lightgray;
+            color: black;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        #result {
+            font-size: 25px;
+            font-family: 'Saira';
+            margin-top: 20px;
+            padding: 10px;
+            background-color: lightgray;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+        .back{
+            background-color: none;
+            border-radius: 15px;
+            width: 50px;
+            border: none;
+            text-align: center;
+            font-size: 17px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+        <div><h1>随机数生成</h1><button class="back" onclick="window.location.href='a.html'"><<</button></div>
+        <div class="form-group">
+            <label>最小值：</label>
+            <input placeholder="min" type="number" id="min" step="any" required>
+        </div>
+        <div class="form-group">
+            <label>最大值：</label>
+            <input placeholder="max" type="number" id="max" step="any" required>
+        </div>
+        <div class="form-group">
+            <label>步长：</label>
+            <input placeholder="step" type="number" id="precision" value="1" min="0">
+        </div>
+        <div class="form-group">
+            <label>数量：</label>
+            <input placeholder="amount" type="number" id="count" value="1" min="1">
+        </div>
+        <button onclick="generateNumbers()">生成随机数</button>
+        <div id="result"></div>
+        <div></div>
+
+    <script>
+        function generateNumbers() {
+            // 获取输入值
+            const min = parseFloat(document.getElementById('min').value);
+            const max = parseFloat(document.getElementById('max').value);
+            const precision = parseFloat(document.getElementById('precision').value) || 1;
+            const count = parseInt(document.getElementById('count').value) || 1;
+
+            // 输入验证
+            if (min >= max) {
+                document.getElementById('result').textContent = "错误：最小值必须小于最大值";
+                return;
+            }
+            if (precision <= 0) {
+                document.getElementById('result').textContent = "错误：步长必须大于0";
+                return;
+            }
+
+            // 生成随机数
+            let results = [];
+            for (let i = 0; i < count; i++) {
+                // 计算最小值和最大值之间的范围（以精度为单位）
+                const range = (max - min) / precision;
+                // 生成一个随机的倍数
+                const randomMultiple = Math.floor(Math.random() * (range + 1));
+                // 计算最终的随机数
+                let randomNumber = min + randomMultiple * precision;
+                // 修复浮点数精度问题
+                randomNumber = parseFloat(randomNumber.toFixed(10)); // 保留10位小数
+                results.push(randomNumber);
+            }
+
+            // 格式化输出
+            let output = "";
+            const separator = ",";
+            output = results.join(separator);
+
+            // 显示结果
+            document.getElementById('result').textContent = output;
+        }
+    </script>
+</body>
+</html>

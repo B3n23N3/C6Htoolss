@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>颜色代码转换器</title>
+    <style>
+        @font-face{
+            font-family: 'Saira';
+            src: url(\Saira-Regular.ttf);
+            font-weight: normal;
+            font-style: normal;
+        }
+        body{
+            font-family: 'Saira';
+            max-width: 400px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+        div{
+            font-family: "Saira";
+        }
+        select{
+            border: none;
+            background-color: lightgray;
+            font-family: 'Saira';
+            font-size: 20px;
+            border-radius: 10px;
+            width: 80px;
+        }
+        input{
+            border: none;
+            background-color: lightgray;
+            font-family: 'Saira';
+            font-size: 20px;
+            border-radius: 10px;
+            width: 160px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: lightgray;
+            color: black;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        #result {
+            font-size: 25px;
+            font-family: 'Saira';
+            margin-top: 20px;
+            background-color: lightgray;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+        #output{
+            font-family: 'Saira';
+            font-weight: bold;
+            word-break: break-all;
+            padding: 10px;
+            width: 100%;
+            background-color: lightgrey;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .back{
+            background-color: none;
+            border-radius: 15px;
+            width: 50px;
+            border: none;
+            text-align: center;
+            font-size: 17px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>颜色代码转换</h1><button class="back" onclick="window.location.href='a.html'"><<</button>
+        
+        <div class="form-group">
+            <span>将</span>
+            <select id="fromType">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="hsl">HSL</option>
+                <option value="hsv">HSV</option>
+            </select>
+            <input type="text" id="colorInput" placeholder="colorcode">
+        </div>
+        
+        <div class="form-group">
+            <span>转为</span>
+            <select id="toType">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="hsl">HSL</option>
+                <option value="hsv">HSV</option>
+            </select>
+        </div>
+        
+        <button id="convertBtn">转换</button>
+        <div id="output"></div>
+    <div style="display: inline-block;margin: 0 10px 0 0;">
+        <h2>颜色代码如下参考：</h2>
+        <h3>HEX:&nbsp;#ffffff&nbsp;|&nbsp;#FFFFFF</h3>
+        <h3>RGB:&nbsp;RGB(255,255,255)&nbsp;|&nbsp;rgb(255,255,255)</h3>
+        <h3>HSL:&nbsp;hsl(0, 0%, 100%)&nbsp;|&nbsp;HSL(0, 0%, 100%)</h3>
+        <h3>HSV:&nbsp;hsv(0, 0%, 100%)&nbsp;|&nbsp;HSV(0, 0%, 100%)</h3>
+    </div>
+
+    <script>
+        document.getElementById('convertBtn').addEventListener('click', convertColorCode);
+        document.getElementById('colorInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convertColorCode();
+            }
+        });
+
+        function convertColorCode() {
+            const fromType = document.getElementById('fromType').value;
+            const toType = document.getElementById('toType').value;
+            const colorInput = document.getElementById('colorInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            const outputDiv = document.getElementById('output');
+            
+            if (!colorInput) return;
+            
+            try {
+                let color = parseColor(colorInput, fromType);
+                let result = convertColor(color, toType);
+                
+                outputDiv.textContent = result;
+                outputDiv.style.color = getColorString(color, 'hex');
+                resultDiv.style.display = 'block';
+            } catch (e) {
+                resultDiv.style.display = 'none';
+            }
+        }
+        
+        function parseColor(input, type) {
+            input = input.toLowerCase().trim();
+            
+            switch (type) {
+                case 'hex': return parseHex(input);
+                case 'rgb': return parseRgb(input);
+                case 'hsl': return parseHsl(input);
+                case 'hsv': return parseHsv(input);
+                default: return { r: 0, g: 0, b: 0 };
+            }
+        }
+        
+        function parseHex(hex) {
+            hex = hex.replace('#', '');
+            
+            if (hex.length === 3) {
+                hex = hex.split('').map(c => c + c).join('');
+            }
+            
+            if (hex.length !== 6) return { r: 0, g: 0, b: 0 };
+            
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            if (isNaN(r) || isNaN(g) || isNaN(b)) return { r: 0, g: 0, b: 0 };
+            
+            return { r, g, b };
+        }
+        
+        function parseRgb(rgb) {
+            const match = rgb.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+            if (!match) return { r: 0, g: 0, b: 0 };
+            
+            const r = parseInt(match[1]);
+            const g = parseInt(match[2]);
+            const b = parseInt(match[3]);
+            
+            if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+                return { r: 0, g: 0, b: 0 };
+            }
+            
+            return { r, g, b };
+        }
+        
+        function parseHsl(hsl) {
+            const match = hsl.match(/^hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)$/i);
+            if (!match) return { r: 0, g: 0, b: 0 };
+            
+            const h = parseInt(match[1]);
+            const s = parseInt(match[2]);
+            const l = parseInt(match[3]);
+            
+            if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
+                return { r: 0, g: 0, b: 0 };
+            }
+            
+            return hslToRgb({ h, s, l });
+        }
+        
+        function parseHsv(hsv) {
+            const match = hsv.match(/^hsv\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)$/i);
+            if (!match) return { r: 0, g: 0, b: 0 };
+            
+            const h = parseInt(match[1]);
+            const s = parseInt(match[2]);
+            const v = parseInt(match[3]);
+            
+            if (h < 0 || h > 360 || s < 0 || s > 100 || v < 0 || v > 100) {
+                return { r: 0, g: 0, b: 0 };
+            }
+            
+            return hsvToRgb({ h, s, v });
+        }
+        
+        function hslToRgb(hsl) {
+            let { h, s, l } = hsl;
+            s /= 100;
+            l /= 100;
+            
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            
+            let r, g, b;
+            
+            if (h >= 0 && h < 60) {
+                [r, g, b] = [c, x, 0];
+            } else if (h >= 60 && h < 120) {
+                [r, g, b] = [x, c, 0];
+            } else if (h >= 120 && h < 180) {
+                [r, g, b] = [0, c, x];
+            } else if (h >= 180 && h < 240) {
+                [r, g, b] = [0, x, c];
+            } else if (h >= 240 && h < 300) {
+                [r, g, b] = [x, 0, c];
+            } else {
+                [r, g, b] = [c, 0, x];
+            }
+            
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+        
+        function hsvToRgb(hsv) {
+            let { h, s, v } = hsv;
+            s /= 100;
+            v /= 100;
+            
+            const c = v * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = v - c;
+            
+            let r, g, b;
+            
+            if (h >= 0 && h < 60) {
+                [r, g, b] = [c, x, 0];
+            } else if (h >= 60 && h < 120) {
+                [r, g, b] = [x, c, 0];
+            } else if (h >= 120 && h < 180) {
+                [r, g, b] = [0, c, x];
+            } else if (h >= 180 && h < 240) {
+                [r, g, b] = [0, x, c];
+            } else if (h >= 240 && h < 300) {
+                [r, g, b] = [x, 0, c];
+            } else {
+                [r, g, b] = [c, 0, x];
+            }
+            
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+        
+        function convertColor(color, toType) {
+            switch (toType) {
+                case 'hex': return getColorString(color, 'hex');
+                case 'rgb': return getColorString(color, 'rgb');
+                case 'hsl': return rgbToHsl(color);
+                case 'hsv': return rgbToHsv(color);
+                default: return '';
+            }
+        }
+        
+        function getColorString(color, type) {
+            const { r, g, b } = color;
+            
+            switch (type) {
+                case 'hex': return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
+                case 'rgb': return `rgb(${r}, ${g}, ${b})`;
+                default: return '';
+            }
+        }
+        
+        function componentToHex(c) {
+            const hex = c.toString(16).padStart(2, '0');
+            return hex;
+        }
+        
+        function rgbToHsl(color) {
+            let { r, g, b } = color;
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            
+            h = Math.round(h * 360);
+            s = Math.round(s * 100);
+            l = Math.round(l * 100);
+            
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+        
+        function rgbToHsv(color) {
+            let { r, g, b } = color;
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const d = max - min;
+            let h, s, v = max;
+            
+            if (max === 0) {
+                s = 0;
+            } else {
+                s = d / max;
+            }
+            
+            if (max === min) {
+                h = 0;
+            } else {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            
+            h = Math.round(h * 360);
+            s = Math.round(s * 100);
+            v = Math.round(v * 100);
+            
+            return `hsv(${h}, ${s}%, ${v}%)`;
+        }
+    </script>
+</body>
+</html>
