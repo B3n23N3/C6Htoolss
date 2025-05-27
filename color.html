@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>颜色代码转换器</title>
     <style>
-        @font-face{
+       @font-face{
             font-family: 'Saira';
             src: url(\Saira-Regular.ttf);
             font-weight: normal;
             font-style: normal;
         }
         .container {
-            margin: 0;
+            max-width: 1200px;
+            margin: 0 auto;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -20,11 +21,6 @@
             overflow-wrap: break-word;
             word-break: break-word;
             white-space: normal;
-        }
-        body{
-            font-family: 'Saira';
-            max-width: 400px;
-            display: flex;
         }
         .form-group {
             margin-bottom: 15px;
@@ -36,21 +32,14 @@
         div{
             font-family: "Saira";
         }
-        select{
-            border: none;
-            background-color: lightgray;
-            font-family: 'Saira';
-            font-size: 20px;
-            border-radius: 10px;
-            width: 80px;
-        }
         input{
             border: none;
             background-color: lightgray;
             font-family: 'Saira';
             font-size: 20px;
             border-radius: 10px;
-            width: 160px;
+            width: 200px;
+            padding: 5px;
         }
         button {
             padding: 8px 15px;
@@ -64,28 +53,26 @@
             font-size: 25px;
             font-family: 'Saira';
             margin-top: 20px;
+            padding: 10px;
             background-color: lightgray;
             border-radius: 10px;
             white-space: pre-wrap;
         }
-        #output{
-            font-family: 'Saira';
-            font-weight: bold;
-            word-break: break-all;
-            padding: 10px;
-            width: 100%;
-            background-color: lightgrey;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
         .back{
             background-color: none;
-            border-radius: 15px;
+            border-radius: 10px;
             width: 50px;
             border: none;
             text-align: center;
             font-size: 17px;
             padding: 5px;
+        }
+        select{
+            border: none;
+            background-color: lightgrey;
+            font-size: 20px;
+            border-radius: 5px;
+            font-family: 'Saira';
         }
     </style>
 </head>
