@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进制转换</title>
+    <style>
+        @font-face{
+            font-family: 'Saira';
+            src: url(\Saira-Regular.ttf);
+            font-weight: normal;
+            font-style: normal;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+        div{
+            font-family: "Saira";
+        }
+        input{
+            border: none;
+            background-color: lightgray;
+            font-family: 'Saira';
+            font-size: 15px;
+            border-radius: 10px;
+            width:300px;
+            padding: 5px;
+            margin: 5px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: lightgray;
+            color: black;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        #result {
+            font-size: 20px;
+            font-family: 'Saira';
+            margin-top: 20px;
+            padding: 10px;
+            background-color: lightgray;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+        .back{
+            background-color: none;
+            border-radius: 10px;
+            width: 50px;
+            border: none;
+            text-align: center;
+            font-size: 17px;
+            padding: 5px;
+        }
+        select{
+            border: none;
+            background-color: lightgrey;
+            font-size: 20px;
+            border-radius: 5px;
+            font-family: 'Saira';
+        }
+        .advanced-toggle {
+            color: lightgrey;
+            cursor: pointer;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .advanced-content {
+            display: none;
+            padding: 10px;
+            background-color: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .note {
+            font-size: 12px;
+            color: red;
+            margin-top: 5px;
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #fdecea !important;
+        }
+        .precision-control {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .precision-control label {
+            margin-right: 10px;
+            width: auto;
+        }
+        .precision-control input {
+            width: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>进制转换</h1><button class="back" onclick="window.location.href='home.html'"><<</button>
+
+        <div class="input-group">
+            <label for="originalNumber">原数</label>
+            <input type="text" id="originalNumber" placeholder="number">
+        </div>
+        
+        <div class="input-group">
+            <label for="fromBase">原数进制</label>
+            <input type="number" id="fromBase" placeholder="base(>2)" min="2" value="10">
+        </div>
+        
+        <div class="input-group">
+            <label for="toBase">目标进制</label>
+            <input type="number" id="toBase" placeholder="base(>2)" min="2" value="2">
+        </div>
+        
+        <div class="precision-control">
+            <label for="precision">小数精度：</label>
+            <input type="number" id="precision" min="1" max="20" value="10">
+        </div>
+        
+        <button id="convertBtn">转换</button>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="advanced-toggle" id="advancedToggle">▼ 高级选项</div>
+        
+        <div class="advanced-content" id="advancedContent">
+            <div class="input-group">
+                <label for="symbols">进制符</label>
+                <input type="text" id="symbols" placeholder="输入进制符号 (如: 0123456789ABCDEF)" value="0123456789ABCDEF">
+                <div class="note">注意：符号数量必须大于等于原数进制和目标进制</div>
+            </div>
+            <div class="input-group">
+                <label for="decimalPoint">小数点</label>
+                <input type="text" id="decimalPoint" placeholder="输入小数点符号" value="." maxlength="1">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('advancedToggle').addEventListener('click', function() {
+            const content = document.getElementById('advancedContent');
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                this.textContent = '▼ 高级选项';
+            } else {
+                content.style.display = 'block';
+                this.textContent = '▲ 高级选项';
+            }
+        });
+
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const originalNumber = document.getElementById('originalNumber').value.trim();
+            const fromBase = parseInt(document.getElementById('fromBase').value);
+            const toBase = parseInt(document.getElementById('toBase').value);
+            const customSymbols = document.getElementById('symbols').value.trim();
+            const decimalPoint = document.getElementById('decimalPoint').value || '.';
+            const precision = parseInt(document.getElementById('precision').value);
+            
+            // 重置错误状态
+            document.getElementById('result').className = 'result';
+            
+            // 验证输入
+            if (!originalNumber) {
+                showResult('请输入原数', 'error');
+                return;
+            }
+            
+            if (isNaN(fromBase) || fromBase < 2) {
+                showResult('原数进制必须是不小于2的整数', 'error');
+                return;
+            }
+            
+            if (isNaN(toBase) || toBase < 2) {
+                showResult('目标进制必须是不小于2的整数', 'error');
+                return;
+            }
+            
+            if (isNaN(precision) || precision < 1 || precision > 20) {
+                showResult('小数精度必须是1-20之间的整数', 'error');
+                return;
+            }
+            
+            // 检查符号是否足够表示原数进制和目标进制
+            if (customSymbols.length < fromBase) {
+                showResult(`进制符号数量(${customSymbols.length})不足以表示原数进制(${fromBase})`, 'error');
+                return;
+            }
+            
+            if (customSymbols.length < toBase) {
+                showResult(`进制符号数量(${customSymbols.length})不足以表示目标进制(${toBase})`, 'error');
+                return;
+            }
+            
+            try {
+                // 验证原数是否有效
+                if (!isValidNumber(originalNumber, fromBase, customSymbols, decimalPoint)) {
+                    showResult('原数不符合指定的进制或符号', 'error');
+                    return;
+                }
+                
+                // 转换为十进制
+                const decimalValue = convertToDecimal(originalNumber, fromBase, customSymbols, decimalPoint);
+                
+                // 使用自定义符号进行转换
+                const converted = convertFromDecimal(decimalValue, toBase, customSymbols, decimalPoint, precision);
+                showResult(`转换结果: ${converted}`);
+            } catch (error) {
+                showResult('转换出错: ' + error.message, 'error');
+            }
+        });
+        
+        function isValidNumber(numberStr, base, symbols, decimalPoint) {
+            if (numberStr === '') return false;
+            
+            // 检查负号
+            let str = numberStr;
+            if (numberStr[0] === '-') {
+                str = numberStr.substring(1);
+            }
+            
+            // 检查小数点
+            const parts = str.split(decimalPoint);
+            if (parts.length > 2) return false; // 多个小数点
+            
+            // 检查整数部分
+            if (parts[0] !== '') {
+                const integerPart = parts[0];
+                const validIntegerSymbols = symbols.substring(0, base);
+                for (let i = 0; i < integerPart.length; i++) {
+                    if (validIntegerSymbols.indexOf(integerPart[i]) === -1) {
+                        return false;
+                    }
+                }
+            }
+            
+            // 检查小数部分
+            if (parts.length > 1 && parts[1] !== '') {
+                const fractionalPart = parts[1];
+                const validFractionalSymbols = symbols.substring(0, base);
+                for (let i = 0; i < fractionalPart.length; i++) {
+                    if (validFractionalSymbols.indexOf(fractionalPart[i]) === -1) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
+        function convertToDecimal(numberStr, fromBase, symbols, decimalPoint) {
+            if (numberStr === '0') return 0;
+            
+            let isNegative = false;
+            let str = numberStr;
+            
+            if (numberStr[0] === '-') {
+                isNegative = true;
+                str = numberStr.substring(1);
+            }
+            
+            const parts = str.split(decimalPoint);
+            const baseSymbols = symbols.substring(0, fromBase);
+            
+            // 转换整数部分
+            let integerValue = 0;
+            if (parts[0] !== '') {
+                const integerPart = parts[0];
+                for (let i = 0; i < integerPart.length; i++) {
+                    const char = integerPart[i];
+                    const value = baseSymbols.indexOf(char);
+                    integerValue = integerValue * fromBase + value;
+                }
+            }
+            
+            // 转换小数部分
+            let fractionalValue = 0;
+            if (parts.length > 1 && parts[1] !== '') {
+                const fractionalPart = parts[1];
+                let divisor = 1;
+                for (let i = 0; i < fractionalPart.length; i++) {
+                    divisor *= fromBase;
+                    const char = fractionalPart[i];
+                    const value = baseSymbols.indexOf(char);
+                    fractionalValue += value / divisor;
+                }
+            }
+            
+            const decimalValue = integerValue + fractionalValue;
+            return isNegative ? -decimalValue : decimalValue;
+        }
+        
+        function convertFromDecimal(decimalValue, toBase, symbols, decimalPoint, precision) {
+            if (decimalValue === 0) return symbols[0];
+            
+            let isNegative = false;
+            let value = decimalValue;
+            const baseSymbols = symbols.substring(0, toBase);
+            
+            if (value < 0) {
+                isNegative = true;
+                value = -value;
+            }
+            
+            // 处理整数部分
+            let integerPart = Math.floor(value);
+            let integerResult = '';
+            
+            if (integerPart === 0) {
+                integerResult = baseSymbols[0];
+            } else {
+                while (integerPart > 0) {
+                    const remainder = integerPart % toBase;
+                    integerResult = baseSymbols[remainder] + integerResult;
+                    integerPart = Math.floor(integerPart / toBase);
+                }
+            }
+            
+            // 处理小数部分
+            let fractionalResult = '';
+            let fractionalPart = value - Math.floor(value);
+            
+            if (fractionalPart > 0) {
+                fractionalResult += decimalPoint;
+                for (let i = 0; i < precision && fractionalPart > 0; i++) {
+                    fractionalPart *= toBase;
+                    const digit = Math.floor(fractionalPart);
+                    fractionalResult += baseSymbols[digit];
+                    fractionalPart -= digit;
+                }
+            }
+            
+            const result = integerResult + fractionalResult;
+            return isNegative ? '-' + result : result;
+        }
+        
+        function showResult(message, type = 'success') {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = message;
+            if (type === 'error') {
+                resultElement.classList.add('error');
+            } else {
+                resultElement.classList.remove('error');
+            }
+        }
+    </script>
+</body>
+</html>

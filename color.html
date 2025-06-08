@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>颜色调试工具</title>
+    <title>颜色调试</title>
     <style>
+        @font-face{
+            font-family: 'Saira';
+            src: url(\Saira-Regular.ttf);
+            font-weight: normal;
+            font-style: normal;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif,'Saira';
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
@@ -27,6 +33,7 @@
         }
         .slider-container {
             margin-bottom: 15px;
+            font-family: 'Saira';
         }
         label {
             display: inline-block;
@@ -84,6 +91,7 @@
             margin: 15px 0;
             display: flex;
             justify-content: center;
+            font-family: 'Saira';
         }
         .mode-switch button {
             padding: 8px 15px;
@@ -103,7 +111,7 @@
             padding: 10px;
             background-color: #f0f0f0;
             border-radius: 5px;
-            font-family: monospace;
+            font-family: 'Saira';
         }
         .random-btn {
             margin-top: 15px;
@@ -122,15 +130,21 @@
         .random-btn:hover {
             background-color: #0b7dda;
         }
-        .dice-icon {
-            margin-right: 8px;
-            font-size: 18px;
+        .back{
+            background-color: lightgrey;
+            background-color: none;
+            border-radius: 10px;
+            width: 50px;
+            border: none;
+            text-align: center;
+            font-size: 17px;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
     <div class="color-picker">
-        <h1>颜色调试工具</h1>
+        <h1>颜色调试</h1> <button class="back" onclick="window.location.href='home.html'"><<</button>
         
         <div class="color-display" id="colorDisplay"></div>
         
@@ -181,7 +195,7 @@
         </div>
         
         <button class="random-btn" id="randomColor">
-            <span class="dice-icon">🎲</span> 随机颜色
+            随机颜色
         </button>
     </div>
 
